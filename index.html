@@ -8,27 +8,45 @@
   <link rel="manifest" href="./manifest.json" />
   <style>
     :root{
-      --bg:#f7f7f8; /* soft gray */
+      --bg:#f7f7f8;
       --panel:#ffffff;
       --text:#111;
       --muted:#666;
       --border:#e8e8ea;
-      --green:#177245; /* forest green */
-      --orange:#b25400; /* dark orange */
-      --gray:#a0a0a6; /* neutral gray */
+      --green:#177245;
+      --orange:#b25400;
+      --gray:#a0a0a6;
       --radius:16px;
+      --shadow:0 6px 18px rgba(0,0,0,.06);
+      --font-sm: clamp(12px, 1.6vw, 13px);
+      --font-md: clamp(14px, 2.2vw, 16px);
+      --font-lg: clamp(18px, 3vw, 22px);
+      --font-xl: clamp(20px, 4vw, 28px);
+      --morning-bg:#fffdf6; --morning-border:#f7e7a7;
+      --day-bg:#f6fbff; --day-border:#a7d3f7;
+      --night-bg:#f7f6ff; --night-border:#c2b6f7;
+    }
+    [data-theme="dark"]{
+      --bg:#0f1115;
+      --panel:#171a21;
+      --text:#e9eaee;
+      --muted:#9aa0a6;
+      --border:#262b33;
+      --shadow:0 6px 18px rgba(0,0,0,.4);
+      --morning-bg:#2a2514; --morning-border:#6b5b28;
+      --day-bg:#15222e; --day-border:#2f5b7c;
+      --night-bg:#1b1826; --night-border:#4f4480;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       background:var(--bg); color:var(--text);
+      -webkit-text-size-adjust: 100%;
     }
     a{color:inherit}
     .app{max-width:720px; margin:0 auto; min-height:100%; display:flex; flex-direction:column}
     .hidden{display:none!important}
-
-    /* Top bar */
     .topbar{position:sticky; top:0; background:var(--bg); z-index:10; border-bottom:1px solid var(--border)}
     .topbar-inner{display:flex; align-items:center; gap:12px; padding:14px 16px}
     .menu-btn{width:40px; height:40px; border-radius:10px; border:1px solid var(--border); background:var(--panel); display:grid; place-items:center; cursor:pointer}
@@ -36,115 +54,117 @@
     .menu-icon::before,.menu-icon::after{content:""; position:absolute; left:0; right:0; height:2px; background:#444}
     .menu-icon::before{top:-6px}.menu-icon::after{top:6px}
     .greeting{flex:1}
-    .greeting h1{font-size:22px; margin:0}
-    .greeting .date{color:var(--muted); font-size:14px; margin-top:4px}
-
-    /* Content */
+    .greeting h1{font-size:var(--font-lg); margin:0}
+    .greeting .date{color:var(--muted); font-size:var(--font-sm); margin-top:4px}
     .content{padding:8px 16px 24px; flex:1}
-    .panel{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:12px}
-
+    .panel{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:12px; box-shadow:var(--shadow)}
     .section{margin:16px 0}
-    .section h2{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:#555; margin:0 0 8px}
-
+    .section .section-card{border:1px solid var(--border); border-radius:16px; padding:10px; background:#fff}
+    .section h2{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#555; margin:0 0 8px; display:flex; align-items:center; gap:6px}
+    .section.morning .section-card{background:var(--morning-bg); border-color:var(--morning-border)}
+    .section.day .section-card{background:var(--day-bg); border-color:var(--day-border)}
+    .section.night .section-card{background:var(--night-bg); border-color:var(--night-border)}
     .habit-list{display:flex; flex-direction:column; gap:8px}
-    .habit-item{display:flex; align-items:center; justify-content:space-between; padding:12px 12px; border-radius:12px; border:1px solid var(--border); background:#fff; cursor:pointer}
-    .habit-name{font-weight:600}
+    .habit-item{display:flex; align-items:center; justify-content:space-between; padding:12px 12px; border-radius:12px; border:1px solid var(--border); background:var(--panel); cursor:pointer; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; touch-action:manipulation}
+    .habit-name{font-weight:600; font-size:var(--font-md)}
     .status-dot{width:14px; height:14px; border-radius:999px; border:1px solid var(--border); display:inline-block; background:#f2f2f4}
     .status-dot.done{background:var(--green)}
     .status-dot.missed{background:var(--orange)}
     .status-dot.skip{background:var(--gray)}
-
     .banner{margin-top:8px; padding:10px 12px; background:#fffbe6; border:1px solid #ffe58f; border-radius:12px; font-size:13px; color:#7a5b00}
-
     .footer{position:sticky; bottom:0; padding:12px 16px 24px; background:linear-gradient(to bottom, rgba(247,247,248,.6), var(--bg));}
     .add-btn{width:100%; padding:14px 16px; border-radius:14px; border:1px solid var(--border); background:var(--panel); font-weight:700; cursor:pointer}
-
-    /* Drawer menu */
     .drawer{position:fixed; inset:0; display:none}
     .drawer.open{display:block}
     .drawer .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.18)}
-    .drawer .sheet{position:absolute; top:0; bottom:0; left:0; width:78%; max-width:340px; background:#fff; border-right:1px solid var(--border); padding:16px; overflow:auto}
+    .drawer .sheet{position:absolute; top:0; bottom:0; left:0; width:78%; max-width:340px; background:var(--panel); border-right:1px solid var(--border); padding:16px; overflow:auto}
     .sheet h3{margin:0 0 12px}
-    .sheet nav a{display:block; padding:10px 8px; border-radius:10px; color:#222; text-decoration:none}
+    .sheet nav a{display:block; padding:10px 8px; border-radius:10px; color:var(--text); text-decoration:none}
     .sheet nav a:hover{background:#f4f4f6}
-
-    /* Modal */
+    [data-theme="dark"] .sheet nav a:hover{background:#1d212a}
     .modal{position:fixed; inset:0; display:none}
     .modal.open{display:block}
     .modal .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.25)}
-    .modal .card{position:absolute; left:50%; top:12%; transform:translateX(-50%); width:min(560px,92%); background:#fff; border:1px solid var(--border); border-radius:18px; padding:16px}
+    .modal .card{position:absolute; left:50%; top:12%; transform:translateX(-50%); width:min(560px,92%); background:var(--panel); border:1px solid var(--border); border-radius:18px; padding:16px}
     .field{margin:10px 0}
-    label{display:block; font-size:13px; color:#444; margin-bottom:6px}
-    input[type="text"], input[type="date"], select{width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:#fff}
+    label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+    input[type="text"], input[type="date"], select{width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--panel); color:var(--text); font-size:16px}
     .row{display:flex; gap:10px}
     .row .flex{flex:1}
     .modal .actions{display:flex; justify-content:flex-end; gap:8px; margin-top:12px}
-    .btn{padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:#fff; cursor:pointer}
+    .btn{padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:var(--panel); color:var(--text); cursor:pointer}
     .btn.primary{background:#111; color:#fff; border-color:#111}
-
-    /* Habit Detail */
+    .btn.danger{background:#b00020; color:#fff; border-color:#b00020}
+    .habit-top{display:flex; align-items:center; gap:12px; padding:8px 0}
+    .habit-title{font-size:var(--font-lg); font-weight:800}
     .habit-header{display:flex; align-items:center; gap:12px; margin-bottom:8px}
-    .chev{width:36px; height:36px; border:1px solid var(--border); border-radius:12px; background:#fff; display:grid; place-items:center; cursor:pointer}
+    .chev{width:36px; height:36px; border:1px solid var(--border); border-radius:12px; background:var(--panel); display:grid; place-items:center; cursor:pointer}
     .month-title{flex:1; text-align:center; font-weight:700}
-
-    .calendar{background:#fff; border:1px solid var(--border); border-radius:16px; padding:12px}
-    .weekday-row{display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; margin-bottom:6px; font-size:12px; color:#555; text-align:center}
-    .day-grid{display:grid; grid-template-columns: repeat(7, 1fr); gap:6px}
-    .day{position:relative; border:1px solid var(--border); border-radius:12px; padding:10px; min-height:56px; background:#fff; display:flex; align-items:flex-start; justify-content:flex-start; cursor:pointer; transition:transform .08s ease}
+    .calendar{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:12px}
+    .weekday-row{display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; margin-bottom:6px; font-size:12px; color:#888; text-align:center}
+    .day-grid{display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; touch-action:manipulation}
+    .day{position:relative; border:1px solid var(--border); border-radius:12px; padding:10px; min-height:56px; background:var(--panel); display:flex; align-items:flex-start; justify-content:flex-start; cursor:pointer; transition:transform .08s ease; user-select:none}
     .day:active{transform:scale(0.98)}
     .day .num{font-size:12px; color:#777}
     .day .mark{position:absolute; right:8px; bottom:6px; font-weight:800; font-size:18px; line-height:1}
     .day.future{opacity:.5; cursor:not-allowed}
     .day.today{box-shadow: 0 0 0 2px #e5f3ea inset; background:#f7fbf9}
-    .day.off{background:#fafafa}
+    [data-theme="dark"] .day.today{box-shadow: 0 0 0 2px #274c37 inset; background:#121a16}
+    .day.off{background:transparent; border-style:dashed}
     .mark.done{color:var(--green)}
     .mark.missed{color:var(--orange)}
     .mark.skip{color:var(--gray)}
     .pulse{animation:pulse .18s ease}
     @keyframes pulse{0%{transform:scale(0.7); opacity:.6} 100%{transform:scale(1); opacity:1}}
-
     .stats{display:flex; gap:8px; margin-top:10px}
-    .stat{flex:1; background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px}
-    .stat .label{font-size:12px; color:#666}
+    .stat{flex:1; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:10px}
+    .stat .label{font-size:12px; color:var(--muted)}
     .stat .value{font-size:18px; font-weight:800}
-
-    .backlink{display:inline-flex; align-items:center; gap:8px; margin-bottom:8px; text-decoration:none; color:#333}
+    .backlink{display:inline-flex; align-items:center; gap:8px; margin-bottom:8px; text-decoration:none; color:var(--text)}
     .backlink:hover{text-decoration:underline}
+    .confirm-bar{position:fixed; left:0; right:0; bottom:0; padding:12px 16px; display:none; gap:8px; background:var(--panel); border-top:1px solid var(--border); box-shadow:var(--shadow)}
+    .confirm-bar.open{display:flex; align-items:center; justify-content:space-between}
+    .confirm-msg{font-weight:600}
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="app" id="appRoot">
     <header class="topbar">
-      <div class="topbar-inner">
+      <div class="topbar-inner" id="topbarContent">
         <button class="menu-btn" id="openMenu" aria-label="Open menu"><span class="menu-icon"></span></button>
         <div class="greeting">
-          <h1>Hello, Rey</h1>
+          <h1 id="topTitle">Hello, Rey</h1>
           <div class="date" id="todayDate">—</div>
         </div>
       </div>
     </header>
-
     <main class="content">
-      <!-- HOME VIEW -->
       <div id="homeView" class="panel">
         <div id="lateBanner" class="banner" style="display:none"></div>
-        <section class="section" id="morningSection" style="display:none">
-          <h2>Morning</h2>
-          <div class="habit-list" id="morningList"></div>
+        <section class="section morning" id="morningSection" style="display:none">
+          <div class="section-card">
+            <h2>🌅 Morning</h2>
+            <div class="habit-list" id="morningList"></div>
+          </div>
         </section>
-        <section class="section" id="daySection" style="display:none">
-          <h2>Day</h2>
-          <div class="habit-list" id="dayList"></div>
+        <section class="section day" id="daySection" style="display:none">
+          <div class="section-card">
+            <h2>🌤️ Day</h2>
+            <div class="habit-list" id="dayList"></div>
+          </div>
         </section>
-        <section class="section" id="nightSection" style="display:none">
-          <h2>Night</h2>
-          <div class="habit-list" id="nightList"></div>
+        <section class="section night" id="nightSection" style="display:none">
+          <div class="section-card">
+            <h2>🌙 Night</h2>
+            <div class="habit-list" id="nightList"></div>
+          </div>
         </section>
       </div>
-
-      <!-- HABIT DETAIL VIEW -->
       <div id="habitView" class="hidden">
         <a href="#/" class="backlink">← Home</a>
+        <div class="habit-top">
+          <div class="habit-title" id="habitNameTitle">—</div>
+        </div>
         <div class="habit-header">
           <button class="chev" id="prevMonth" aria-label="Previous month">‹</button>
           <div class="month-title" id="monthTitle">—</div>
@@ -166,25 +186,28 @@
         </div>
       </div>
     </main>
-
-    <footer class="footer">
+    <footer class="footer" id="footerBar">
       <button class="add-btn" id="addHabitBtn">+ Add Habit</button>
     </footer>
+    <div class="confirm-bar" id="confirmBar">
+      <div class="confirm-msg" id="confirmMsg">Delete?</div>
+      <div>
+        <button class="btn" id="confirmCancel">Cancel</button>
+        <button class="btn danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
   </div>
-
-  <!-- Drawer Menu -->
   <div class="drawer" id="drawer">
     <div class="backdrop" data-dismiss></div>
     <div class="sheet">
       <h3>StreakX</h3>
       <nav id="drawerNav">
         <a href="#/" data-home>Home</a>
-        <div id="drawerHabits"></div>
+        <a href="#/settings" data-settings>Settings</a>
+        <div id="drawerHabits" style="margin-top:8px"></div>
       </nav>
     </div>
   </div>
-
-  <!-- Add Habit Modal -->
   <div class="modal" id="addHabitModal" role="dialog" aria-modal="true" aria-labelledby="addHabitTitle">
     <div class="backdrop" data-dismiss></div>
     <div class="card">
@@ -216,119 +239,113 @@
       </div>
     </div>
   </div>
-
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="backdrop" data-dismiss></div>
+    <div class="card">
+      <h3 id="settingsTitle">Settings</h3>
+      <div class="field">
+        <label>Appearance</label>
+        <select id="themeSelect">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="system">System</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button class="btn" data-dismiss>Close</button>
+      </div>
+    </div>
+  </div>
   <script>
-    // ---------- Utilities
+    function applyTheme(mode){
+      const root = document.getElementById('appRoot');
+      if(mode === 'dark'){ root.setAttribute('data-theme','dark'); }
+      else if(mode === 'light'){ root.removeAttribute('data-theme'); }
+      else {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if(prefersDark) root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme');
+      }
+      localStorage.setItem('streakx-theme', mode);
+    }
+    (function initTheme(){
+      const saved = localStorage.getItem('streakx-theme') || 'system';
+      applyTheme(saved);
+      const sel = document.getElementById('themeSelect');
+      if(sel) sel.value = saved;
+    })();
     const fmtLong = new Intl.DateTimeFormat(undefined, { dateStyle: 'long' });
     const fmtMonth = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
-    const fmtWeekday = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
     const TODAY = new Date();
-    document.getElementById('todayDate').textContent = fmtLong.format(TODAY);
-
-    function ymd(d){
-      const y=d.getFullYear();
-      const m=String(d.getMonth()+1).padStart(2,'0');
-      const da=String(d.getDate()).padStart(2,'0');
-      return `${y}-${m}-${da}`;
+    function updateTopbar(dateText){
+      document.getElementById('todayDate').textContent = dateText || fmtLong.format(new Date());
     }
-    function parseYMD(s){
-      const [y,m,d] = s.split('-').map(Number);
-      return new Date(y, m-1, d);
-    }
-    function addDays(d, n){
-      const x = new Date(d);
-      x.setDate(x.getDate()+n);
-      return x;
-    }
-    function isSameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
-    function isFuture(date){ const t = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()); return date > t; }
+    document.getElementById('topTitle').textContent = "Hello, Rey";
+    updateTopbar();
+    function ymd(d){const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const da=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${da}`;}
+    function parseYMD(s){const [y,m,d] = s.split('-').map(Number);return new Date(y, m-1, d);}
+    function addDays(d, n){const x = new Date(d);x.setDate(x.getDate()+n);return x;}
+    function isSameDay(a,b){return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();}
+    function isFuture(date){ const t = new Date(); t.setHours(0,0,0,0); return date > t; }
     function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
     function endOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0); }
-    function getMondayIndex(weekday){ return (weekday+6)%7; } // convert Sun(0)..Sat(6) to Mon(0)..Sun(6)
-
-    function weekdaysMonSun(){
-      const base = [0,1,2,3,4,5,6]; // Sun..Sat indexes for Date.getDay()
-      return base.map(i => {
-        const tmp = new Date(2025, 0, 5 + i); // Jan 5, 2025 is a Sunday baseline
-        return fmtWeekday.format(tmp);
-      }).slice(1).concat([fmtWeekday.format(new Date(2025,0,5))]);
-    }
-
-    // ---------- DB (localStorage)
-    const DB = {
-      load(){
-        try { return JSON.parse(localStorage.getItem('streakx-db')||'{"habits":[],"entries":[]}'); }
-        catch{ return { habits:[], entries:[] }; }
-      },
-      save(data){ localStorage.setItem('streakx-db', JSON.stringify(data)); }
-    };
+    function getNowBucket(){const h = new Date().getHours(); if(h<12) return 'morning'; if(h<18) return 'day'; return 'night';}
+    const DB = {load(){try { return JSON.parse(localStorage.getItem('streakx-db')||'{"habits":[],"entries":[]}'); }catch{ return { habits:[], entries:[] }; }}, save(data){ localStorage.setItem('streakx-db', JSON.stringify(data)); }};
     let state = DB.load();
-
-    // ---------- Router (hash-based): #/ and #/habit/{id}
     function navigate(){
       const hash = location.hash || '#/';
-      if(hash === '#/' || hash === '#'){
-        document.getElementById('homeView').classList.remove('hidden');
-        document.getElementById('habitView').classList.add('hidden');
-        renderHome();
-      } else if(hash.startsWith('#/habit/')){
-        const id = hash.split('/')[2];
-        showHabit(id);
-      }
+      document.getElementById('footerBar').classList.remove('hidden');
+      document.getElementById('homeView').classList.add('hidden');
+      document.getElementById('habitView').classList.add('hidden');
+      document.getElementById('topTitle').textContent = "Hello, Rey";
+      updateTopbar();
+      if(hash === '#/' || hash === '#'){document.getElementById('homeView').classList.remove('hidden'); renderHome();}
+      else if(hash.startsWith('#/habit/')){const id = hash.split('/')[2]; showHabit(id);}
+      else if(hash.startsWith('#/settings')){openSettings(); history.replaceState(null, '', '#/');}
     }
     window.addEventListener('hashchange', navigate);
-
-    // ---------- Drawer
     const drawer = document.getElementById('drawer');
     document.getElementById('openMenu').addEventListener('click', ()=> drawer.classList.add('open'));
     drawer.addEventListener('click', (e)=>{ if(e.target.hasAttribute('data-dismiss')) drawer.classList.remove('open'); });
-
-    // ---------- Modal helpers
-    const addHabitModal = document.getElementById('addHabitModal');
-    function openAddHabit(){
-      addHabitModal.classList.add('open');
+    document.querySelector('[data-settings]').addEventListener('click', (e)=>{ e.preventDefault(); drawer.classList.remove('open'); openSettings(); });
+    function openSettings(){document.getElementById('settingsModal').classList.add('open'); const sel=document.getElementById('themeSelect'); if(sel) sel.value = localStorage.getItem('streakx-theme')||'system';}
+    document.getElementById('themeSelect').addEventListener('change', (e)=> applyTheme(e.target.value));
+    function closeModals(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open')); }
+    document.querySelectorAll('[data-dismiss]').forEach(el=> el.addEventListener('click', closeModals));
+    document.getElementById('addHabitBtn').addEventListener('click', ()=>{
+      document.getElementById('addHabitModal').classList.add('open');
       document.getElementById('habitStart').value = ymd(new Date());
       document.getElementById('habitName').value = '';
       document.getElementById('habitBucket').value = getNowBucket();
-    }
-    function closeModals(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open')); }
-    document.getElementById('addHabitBtn').addEventListener('click', openAddHabit);
-    document.querySelectorAll('[data-dismiss]').forEach(el=> el.addEventListener('click', closeModals));
+    });
     document.getElementById('todayBtn').addEventListener('click', ()=>{ document.getElementById('habitStart').value = ymd(new Date()); });
-
-    // ---------- Buckets
-    function getNowBucket(){
-      const h = new Date().getHours();
-      if(h < 12) return 'morning';
-      if(h < 18) return 'day';
-      return 'night';
-    }
-
-    // ---------- Entries helpers
-    function getEntry(habitId, dateStr){
-      return state.entries.find(e => e.habitId===habitId && e.date===dateStr);
-    }
-    function setEntry(habitId, dateStr, status){
-      let e = getEntry(habitId, dateStr);
-      if(e){ e.status = status; }
-      else { state.entries.push({ habitId, date: dateStr, status }); }
+    function getEntry(habitId, dateStr){return state.entries.find(e => e.habitId===habitId && e.date===dateStr);}
+    function setEntry(habitId, dateStr, status){let e = getEntry(habitId, dateStr); if(e){ e.status = status; } else { state.entries.push({ habitId, date: dateStr, status }); } DB.save(state);}
+    function clearEntry(habitId, dateStr){state.entries = state.entries.filter(e => !(e.habitId===habitId && e.date===dateStr)); DB.save(state);}
+    const confirmBar = document.getElementById('confirmBar');
+    const confirmMsg = document.getElementById('confirmMsg');
+    const confirmCancel = document.getElementById('confirmCancel');
+    const confirmDelete = document.getElementById('confirmDelete');
+    let pendingDeleteId = null;
+    confirmCancel.addEventListener('click', ()=>{ confirmBar.classList.remove('open'); pendingDeleteId=null; });
+    confirmDelete.addEventListener('click', ()=>{
+      if(!pendingDeleteId) return;
+      state.habits = state.habits.filter(h=> h.id !== pendingDeleteId);
+      state.entries = state.entries.filter(e=> e.habitId !== pendingDeleteId);
       DB.save(state);
+      confirmBar.classList.remove('open'); pendingDeleteId = null; renderHome();
+    });
+    function attachHomeItemEvents(el, habit){
+      let pressTimer = null;
+      function startPress(){pressTimer = setTimeout(()=>{ pendingDeleteId = habit.id; confirmMsg.textContent = `Delete “${habit.name}”?`; confirmBar.classList.add('open'); }, 650);}
+      function clearPress(){ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } }
+      el.addEventListener('mousedown', startPress);
+      el.addEventListener('touchstart', (e)=>{ startPress(); }, {passive:true});
+      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt=> el.addEventListener(evt, clearPress));
     }
-    function clearEntry(habitId, dateStr){
-      state.entries = state.entries.filter(e => !(e.habitId===habitId && e.date===dateStr));
-      DB.save(state);
-    }
-
-    // ---------- Home rendering
     function renderHome(){
       const buckets = { morning:[], day:[], night:[] };
       state.habits.forEach(h=> buckets[h.bucket].push(h));
-
-      const sections = [
-        ['morning','morningSection','morningList'],
-        ['day','daySection','dayList'],
-        ['night','nightSection','nightList']
-      ];
+      const sections = [['morning','morningSection','morningList'],['day','daySection','dayList'],['night','nightSection','nightList']];
       sections.forEach(([key,secId,listId])=>{
         const sec = document.getElementById(secId);
         const list = document.getElementById(listId);
@@ -339,25 +356,18 @@
           const item = document.createElement('div');
           item.className = 'habit-item';
           item.addEventListener('click', ()=> location.hash = '#/habit/' + h.id);
+          attachHomeItemEvents(item, h);
           const name = document.createElement('div');
           name.className = 'habit-name';
           name.textContent = h.name;
           const dot = document.createElement('span');
           dot.className = 'status-dot';
-          // today's status dot
           const todayKey = ymd(new Date());
           const entry = getEntry(h.id, todayKey);
-          if(entry){
-            if(entry.status==='done') dot.classList.add('done');
-            else if(entry.status==='missed') dot.classList.add('missed');
-            else if(entry.status==='skip') dot.classList.add('skip');
-          }
-          item.appendChild(name); item.appendChild(dot);
-          list.appendChild(item);
+          if(entry){ if(entry.status==='done') dot.classList.add('done'); else if(entry.status==='missed') dot.classList.add('missed'); else if(entry.status==='skip') dot.classList.add('skip'); }
+          item.appendChild(name); item.appendChild(dot); list.appendChild(item);
         });
       });
-
-      // Late banner (nudge)
       const banner = document.getElementById('lateBanner');
       const nowBucket = getNowBucket();
       const order = ['morning','day','night'];
@@ -375,22 +385,14 @@
         const label = earlierBuckets.length ? earlierBuckets[0][0].toUpperCase()+earlierBuckets[0].slice(1) : 'Earlier';
         banner.style.display='block';
         banner.textContent = `${label} items still unlogged: ${unlogged.join(', ')}`;
-      } else {
-        banner.style.display='none';
-      }
-
-      // Drawer links
+      } else { banner.style.display='none'; }
       const drawerHabits = document.getElementById('drawerHabits');
       drawerHabits.innerHTML = '';
       state.habits.forEach(h=>{
         const a = document.createElement('a');
-        a.textContent = h.name;
-        a.href = '#/habit/' + h.id;
-        drawerHabits.appendChild(a);
+        a.textContent = h.name; a.href = '#/habit/' + h.id; drawerHabits.appendChild(a);
       });
     }
-
-    // ---------- Add habit
     document.getElementById('saveHabitBtn').addEventListener('click', ()=>{
       const name = document.getElementById('habitName').value.trim();
       const start = document.getElementById('habitStart').value;
@@ -399,152 +401,81 @@
       const id = crypto.randomUUID();
       const habit = { id, name, startDate:start, bucket, createdAt: new Date().toISOString() };
       state.habits.push(habit);
-      // backfill skips from start to yesterday
       const startDate = parseYMD(start);
       const todayDate = parseYMD(ymd(new Date()));
-      for(let d = new Date(startDate); d < todayDate; d.setDate(d.getDate()+1)){
-        setEntry(id, ymd(d), 'skip');
-      }
+      for(let d = new Date(startDate); d < todayDate; d.setDate(d.getDate()+1)){ setEntry(id, ymd(d), 'skip'); }
       DB.save(state);
-      closeModals();
-      renderHome();
-      location.hash = '#/habit/' + id; // jump into calendar
+      closeModals(); renderHome(); location.hash = '#/habit/' + id;
     });
-
-    // ---------- Habit detail view
     let currentHabitId = null;
-    let currentMonthDate = new Date(); // month being shown
-
+    let currentMonthDate = new Date();
     const weekdayRow = document.getElementById('weekdayRow');
     const dayGrid = document.getElementById('dayGrid');
     weekdayRow.innerHTML = '';
-    // Mon..Sun
-    const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    labels.forEach(l=>{
-      const el = document.createElement('div');
-      el.textContent = l;
-      el.style.textAlign = 'center';
-      weekdayRow.appendChild(el);
-    });
-
+    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(l=>{ const el = document.createElement('div'); el.textContent = l; el.style.textAlign = 'center'; weekdayRow.appendChild(el); });
     function showHabit(habitId){
       currentHabitId = habitId;
       document.getElementById('homeView').classList.add('hidden');
       document.getElementById('habitView').classList.remove('hidden');
-      currentMonthDate = new Date(); // reset to this month on open
-      renderHabitMonth();
+      document.getElementById('footerBar').classList.add('hidden');
+      const habit = state.habits.find(h=> h.id===habitId);
+      document.getElementById('topTitle').textContent = habit ? habit.name : 'Habit';
+      updateTopbar('');
+      document.getElementById('habitNameTitle').textContent = habit ? habit.name : '—';
+      currentMonthDate = new Date(); renderHabitMonth();
     }
-
     function renderHabitMonth(){
       const habit = state.habits.find(h=> h.id===currentHabitId);
       if(!habit){ location.hash = '#/'; return; }
-
       document.getElementById('monthTitle').textContent = fmtMonth.format(currentMonthDate);
-
-      // Build grid for currentMonthDate with Monday-start
       dayGrid.innerHTML = '';
-
       const start = startOfMonth(currentMonthDate);
       const end = endOfMonth(currentMonthDate);
-      const startWeekday = getMondayIndex(start.getDay()); // 0..6 with Monday=0
-      // Leading blanks
-      for(let i=0;i<startWeekday;i++){
-        const cell = document.createElement('div');
-        cell.className = 'day off';
-        dayGrid.appendChild(cell);
-      }
-      // Days of month
+      const startWeekday = (start.getDay()+6)%7;
+      for(let i=0;i<startWeekday;i++){ const cell = document.createElement('div'); cell.className = 'day off'; dayGrid.appendChild(cell); }
       for(let day=1; day<=end.getDate(); day++){
         const cellDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), day);
-        const cell = document.createElement('div');
-        cell.className = 'day';
+        const cell = document.createElement('div'); cell.className = 'day';
         if(isSameDay(cellDate, new Date())) cell.classList.add('today');
         if(isFuture(cellDate)) cell.classList.add('future');
-        const num = document.createElement('div');
-        num.className = 'num';
-        num.textContent = String(day);
-        const mark = document.createElement('div');
-        mark.className = 'mark';
+        const num = document.createElement('div'); num.className = 'num'; num.textContent = String(day);
+        const mark = document.createElement('div'); mark.className = 'mark';
         const dkey = ymd(cellDate);
-        const entry = getEntry(habit.id, dkey);
-        if(entry){
-          if(entry.status==='done'){ mark.textContent='X'; mark.classList.add('done'); }
-          else if(entry.status==='missed'){ mark.textContent='O'; mark.classList.add('missed'); }
-          else if(entry.status==='skip'){ mark.textContent='—'; mark.classList.add('skip'); }
-        }
-
-        // Interaction (past & today only)
+        const entry = state.entries.find(e=> e.habitId===habit.id && e.date===dkey);
+        if(entry){ if(entry.status==='done'){ mark.textContent='X'; mark.classList.add('done'); } else if(entry.status==='missed'){ mark.textContent='O'; mark.classList.add('missed'); } else if(entry.status==='skip'){ mark.textContent='—'; mark.classList.add('skip'); } }
         if(!isFuture(cellDate)){
           let pressTimer = null;
-          cell.addEventListener('mousedown', ()=>{ pressTimer = setTimeout(()=>{
-            clearEntry(habit.id, dkey);
-            mark.textContent='';
-            mark.className='mark pulse';
-            updateStreaks(habit.id);
-          }, 550); });
-          cell.addEventListener('mouseup', ()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } });
-          cell.addEventListener('mouseleave', ()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } });
+          const startPress = ()=>{ pressTimer = setTimeout(()=>{ state.entries = state.entries.filter(e=> !(e.habitId===habit.id && e.date===dkey)); mark.textContent=''; mark.className='mark pulse'; DB.save(state); updateStreaks(habit.id); }, 550); };
+          const clearPress = ()=>{ if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; } };
+          cell.addEventListener('mousedown', startPress);
+          cell.addEventListener('touchstart', startPress, {passive:true});
+          ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt=> cell.addEventListener(evt, clearPress));
           cell.addEventListener('click', ()=>{
-            // cycle: empty -> done -> missed -> skip -> empty
-            const e = getEntry(habit.id, dkey);
+            const e = state.entries.find(x=> x.habitId===habit.id && x.date===dkey);
             let next = 'done';
-            if(e){
-              if(e.status==='done') next='missed';
-              else if(e.status==='missed') next='skip';
-              else if(e.status==='skip') next='empty';
-            }
-            if(next==='empty'){
-              clearEntry(habit.id, dkey);
-              mark.textContent='';
-              mark.className='mark pulse';
-            } else {
-              setEntry(habit.id, dkey, next);
-              mark.className='mark pulse ' + (next==='done'?'done':next==='missed'?'missed':'skip');
-              mark.textContent = next==='done'?'X':next==='missed'?'O':'—';
-            }
-            updateStreaks(habit.id);
-            renderHome(); // update dots & banner
+            if(e){ if(e.status==='done') next='missed'; else if(e.status==='missed') next='skip'; else if(e.status==='skip') next='empty'; }
+            if(next==='empty'){ state.entries = state.entries.filter(x=> !(x.habitId===habit.id && x.date===dkey)); mark.textContent=''; mark.className='mark pulse'; }
+            else { const status = next; let ey = state.entries.find(x=> x.habitId===habit.id && x.date===dkey); if(ey) ey.status = status; else state.entries.push({habitId:habit.id, date:dkey, status}); mark.className='mark pulse ' + (status==='done'?'done':status==='missed'?'missed':'skip'); mark.textContent = status==='done'?'X':status==='missed'?'O':'—'; }
+            DB.save(state); updateStreaks(habit.id); renderHome();
           });
         }
-
-        cell.appendChild(num); cell.appendChild(mark);
-        dayGrid.appendChild(cell);
+        cell.appendChild(num); cell.appendChild(mark); dayGrid.appendChild(cell);
       }
-
-      // Trailing blanks to complete rows (optional for symmetry)
-      const cellsSoFar = dayGrid.children.length;
-      const remainder = cellsSoFar % 7;
-      if(remainder !== 0){
-        for(let i=0;i<7-remainder;i++){
-          const cell = document.createElement('div');
-          cell.className = 'day off';
-          dayGrid.appendChild(cell);
-        }
-      }
-
+      const cellsSoFar = dayGrid.children.length; const remainder = cellsSoFar % 7;
+      if(remainder !== 0){ for(let i=0;i<7-remainder;i++){ const cell = document.createElement('div'); cell.className = 'day off'; dayGrid.appendChild(cell);} }
       updateStreaks(habit.id);
     }
-
-    // ---------- Streaks (skips neutral; missed/empty break segments)
-    function statusFor(habitId, dateStr){
-      const e = getEntry(habitId, dateStr);
-      return e ? e.status : 'empty';
-    }
-
+    function statusFor(habitId, dateStr){const e = state.entries.find(x=> x.habitId===habitId && x.date===dateStr); return e ? e.status : 'empty';}
     function currentStreak(habitId){
-      let count = 0;
-      let d = new Date();
+      let count = 0; let d = new Date();
       const startDate = parseYMD(state.habits.find(h=>h.id===habitId).startDate);
       while(d >= startDate){
         const s = statusFor(habitId, ymd(d));
         if(s === 'missed' || s === 'empty') break;
         if(s === 'done') count++;
-        // skip is neutral: continue without incrementing
         d = addDays(d, -1);
-      }
-      return count;
+      } return count;
     }
-
     function longestStreak(habitId){
       const habit = state.habits.find(h=>h.id===habitId);
       const start = parseYMD(habit.startDate);
@@ -552,42 +483,18 @@
       let best = 0, cur = 0;
       for(let d = new Date(start); d <= today; d = addDays(d, 1)){
         const s = statusFor(habitId, ymd(d));
-        if(s === 'missed' || s === 'empty'){
-          if(cur>best) best = cur;
-          cur = 0;
-        } else if(s === 'done'){
-          cur++;
-        } // skip: do nothing (neutral)
-      }
-      if(cur>best) best = cur;
-      return best;
+        if(s === 'missed' || s === 'empty'){ if(cur>best) best = cur; cur = 0; }
+        else if(s === 'done'){ cur++; }
+      } if(cur>best) best = cur; return best;
     }
-
     function updateStreaks(habitId){
       document.getElementById('currentStreak').textContent = currentStreak(habitId);
       document.getElementById('longestStreak').textContent = longestStreak(habitId);
     }
-
-    // ---------- Month nav
-    document.getElementById('prevMonth').addEventListener('click', ()=>{
-      currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()-1, 1);
-      renderHabitMonth();
-    });
-    document.getElementById('nextMonth').addEventListener('click', ()=>{
-      currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+1, 1);
-      renderHabitMonth();
-    });
-
-    // ---------- PWA: register service worker
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', ()=>{
-        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-      });
-    }
-
-    // initial render
-    navigate(); // show appropriate view
-    renderHome(); // ensure home is populated on first load
+    document.getElementById('prevMonth').addEventListener('click', ()=>{ currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()-1, 1); renderHabitMonth(); });
+    document.getElementById('nextMonth').addEventListener('click', ()=>{ currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+1, 1); renderHabitMonth(); });
+    if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./service-worker.js').catch(()=>{}); }); }
+    navigate(); renderHome();
   </script>
 </body>
 </html>
